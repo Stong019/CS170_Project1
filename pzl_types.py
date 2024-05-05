@@ -110,13 +110,6 @@ class Problem:
         return self.initial_state
     
 def search(problem, algo_choice):
-
-        ##if algo_choice == 1:
-           ##hn = 0
-        ##if algo_choice == 2:
-            ##hn = self.misplaced_tile(self.initial_state)
-        ##if algo_choice == 3:
-            ##hn = self.euclidean_dist(self.initial_state)
     nodeQueue = queue.PriorityQueue()
     startNode = Node(problem.state())
     startNode.set_gn(0)
@@ -136,25 +129,14 @@ def search(problem, algo_choice):
             return node
         print("The best state to expand with a g(n) = {gn} and h(n) = {hn} is ...".format(gn=node.get_gn(), hn=node.get_hn()))
         ##tile_print(node)
-
-        ##nodes = q_function(nodes, problem.operators(node))
-        if algo_choice == 1:
-            for node in nodeQueue:
-                node.set_hn(0)
-                curr_gn = node.get_gn()
-                node.set_fn(curr_gn + 0)
-                nodeQueue.put(node)
-        
-        if algo_choice == 2:
-            for node in nodeQueue:
-                node.set_hn(0)
-                curr_gn = node.get_gn()
-                node.set_fn(curr_gn + 0)
-                nodeQueue.put(node)
-            
-        # Check for max queue size
-        ##trySize = nodes.qsize()
-        ##if trySize > maxQueueSize:
-            ##maxQueueSize = trySize
-
-    return 0
+        for index, tile in enumerate(node.get_state()):
+            if tile == 0:
+                print("b", end=' ')
+            else:
+                print(tile, end=' ')
+            if index % 3 == 2:
+                print()
+        print()
+        newNodes = problem.operator(node, algo_choice)
+        for node in newNodes:
+            nodeQueue.put(node)
