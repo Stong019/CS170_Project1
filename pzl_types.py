@@ -1,3 +1,4 @@
+import queue
 class Node:
     def __init__(self, state, parent=None, action=None, gn=0):
         self.state = state
@@ -9,6 +10,27 @@ class Node:
 
     def __lt__(self, other):
         return self.fn < other.fn
+    
+    def get_state(self):
+        return self.state
+
+    def set_gn(self, gn):
+        self.gn = gn
+    
+    def get_gn(self):
+        return self.gn
+
+    def set_hn(self, hn):
+        self.hn = hn
+
+    def get_hn(self):
+        return self.hn
+    
+    def set_fn(self, fn):
+        self.fn = fn
+
+    def get_fn(self):
+        return self.fn
 
 
 class Problem:
@@ -84,13 +106,55 @@ class Problem:
                     operator_list.append(new_node)
         return operator_list
     
-    def search(self, algo_choice):
+    def state(self):
+        return self.initial_state
+    
+def search(problem, algo_choice):
 
+        ##if algo_choice == 1:
+           ##hn = 0
+        ##if algo_choice == 2:
+            ##hn = self.misplaced_tile(self.initial_state)
+        ##if algo_choice == 3:
+            ##hn = self.euclidean_dist(self.initial_state)
+    nodeQueue = queue.PriorityQueue()
+    startNode = Node(problem.state())
+    startNode.set_gn(0)
+    startNode.set_hn(0)
+    startNode.set_fn(0)
+    nodeQueue.put(startNode)
+    print("Expanding state")
+    while(1):
+        if nodeQueue.empty():
+            return "failure"
+        node = nodeQueue.get()
+        if problem.goal_test(node.get_state()):
+            print("Goal!!")
+            print("To solve this problem the search algorithm expanded a total of {node_total} nodes".format(node_total = problem.get_node_count()))
+            print("The maximum number of nodes in the queue at any one time was {max_queue_nodes}.".format(max_queue_nodes=maxQueueSize))
+            print("The depth of the goal node was {depth}".format(depth=node.get_gn()))
+            return node
+        print("The best state to expand with a g(n) = {gn} and h(n) = {hn} is ...".format(gn=node.get_gn(), hn=node.get_hn()))
+        ##tile_print(node)
+
+        ##nodes = q_function(nodes, problem.operators(node))
         if algo_choice == 1:
-            hn = 0
+            for node in nodeQueue:
+                node.set_hn(0)
+                curr_gn = node.get_gn()
+                node.set_fn(curr_gn + 0)
+                nodeQueue.put(node)
+        
         if algo_choice == 2:
-            hn = self.misplaced_tile(self.initial_state)
-        if algo_choice == 3:
-            hn = self.euclidean_dist(self.initial_state)
+            for node in nodeQueue:
+                node.set_hn(0)
+                curr_gn = node.get_gn()
+                node.set_fn(curr_gn + 0)
+                nodeQueue.put(node)
+            
+        # Check for max queue size
+        ##trySize = nodes.qsize()
+        ##if trySize > maxQueueSize:
+            ##maxQueueSize = trySize
 
-        return
+    return 0
