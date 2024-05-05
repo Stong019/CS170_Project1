@@ -31,6 +31,25 @@ class Problem:
         for i, row in enumerate(state):
             if 0 in row:
                 return (i, row.index(0))  # returns a tuple of (row, col)
+            
+    def misplaced_tile(self, state):
+        m_cnt = 0
+        for i in range(len(state)):
+            for j in range(len(state)):
+                if int(state[i][j]) != self.goal_state[i][j] and int(state[i][j]) != 0:
+                    m_cnt += 1
+        return m_cnt
+    
+    def euclidean_dist(self, state):
+        dist = 0
+        for r in range(len(state)):
+            for c in range(len(state)):
+                if state[r][c] != 0:
+                    gr = (state[r][c] - 1) // 3  
+                    gc = (state[r][c] - 1) % 3
+                    dist += ((gr - r) ** 2 + (gc - c) ** 2) ** 0.5
+        return dist
+
 
     def operators(self, input_node) -> list(Node):
         curr_state = input_node.state
@@ -57,3 +76,5 @@ class Problem:
                     )
                     operator_list.append(new_node)
         return operator_list
+    
+
