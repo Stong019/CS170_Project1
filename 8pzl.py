@@ -26,9 +26,11 @@ def main():
         pzl = [r1, r2, r3]
 
     # Ensure puzzle is valid
-    if len(pzl) != 9 or set(pzl) != set(range(9)):
-        print("Invalid puzzle configuration!")
-        return
+    # if len(pzl) != 9 or set(pzl) != set(range(9)):
+    #     print("Invalid puzzle configuration!")
+    #     return
+
+    problem = Problem(pzl)
 
     algo_choice = int(
         input(
@@ -37,7 +39,8 @@ def main():
         )
     )
 
-    problem = Problem(pzl)
+    problem.search(algo_choice)
+    
 
 
 if __name__ == "__main__":

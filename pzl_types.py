@@ -3,7 +3,7 @@ class Node:
         self.state = state
         self.parent = parent
         self.action = action  # needed for reconstructing the path
-        self.gn = 0  # cost from start node to current node
+        self.gn = gn  # cost from start node to current node
         self.hn = 0  # est heuristic cost from current node to the goal node
         self.fn = 0  # gn + hn
 
@@ -27,7 +27,7 @@ class Problem:
         self.visited_states.add(tuple(state))
         return False
 
-    def get_b_pos(self, state) -> tuple(int, int):
+    def get_b_pos(self, state) :
         for i, row in enumerate(state):
             if 0 in row:
                 return (i, row.index(0))  # returns a tuple of (row, col)
@@ -51,7 +51,7 @@ class Problem:
         return dist
 
 
-    def operators(self, input_node) -> list(Node):
+    def operators(self, input_node, algo_choice) :
         curr_state = input_node.state
         row, col = self.get_b_pos(curr_state)
         directions = [(-1, 0, "up"), (1, 0, "down"), (0, -1, "left"), (0, 1, "right")]
@@ -74,7 +74,23 @@ class Problem:
                         action=action,
                         gn=input_node.gn + 1,
                     )
+                    if algo_choice == 1:
+                        new_node.hn = 0
+                    if algo_choice == 2:
+                        new_node.hn = self.misplaced_tile(self.initial_state)
+                    if algo_choice == 3:
+                        new_node.hn = self.euclidean_dist(self.initial_state)
+
                     operator_list.append(new_node)
         return operator_list
     
+    def search(self, algo_choice):
 
+        if algo_choice == 1:
+            hn = 0
+        if algo_choice == 2:
+            hn = self.misplaced_tile(self.initial_state)
+        if algo_choice == 3:
+            hn = self.euclidean_dist(self.initial_state)
+
+        return
