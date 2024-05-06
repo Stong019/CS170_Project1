@@ -97,6 +97,7 @@ def search(problem, algo_choice):
         initial_hn = problem.euclidean_dist(problem.initial_state)
     startNode = Node(problem.initial_state, gn=0, hn=initial_hn)
     nodeQueue.put(startNode)
+    problem.max_node_cnt = 1
     problem.visited_states[tuple(tuple(x) for x in problem.initial_state)] = startNode
 
     while not nodeQueue.empty():
