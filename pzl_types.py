@@ -11,7 +11,10 @@ class Node:
         self.fn = self.gn + self.hn  # gn + hn
 
     def __lt__(self, other):
-        return self.fn < other.fn
+        if (self.hn == 0):
+            return self.fn < other.fn
+        
+        return self.hn < other.hn
 
     def get_state(self):
         return self.state
