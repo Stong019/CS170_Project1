@@ -43,12 +43,12 @@ class Problem:
         return self.goal_state == state
 
     def is_visited(self, state):
-        if tuple(state) in self.visited_states:
+        state_tuple = tuple(tuple(row) for row in state)
+    
+        if state_tuple in self.visited_states:
             return True
-        # return false so we know to visit the children of the states
-        self.visited_states.add(tuple(state))
+        self.visited_states.add(state_tuple)
         return False
-
     def get_b_pos(self, state) :
         for i, row in enumerate(state):
             if 0 in row:
@@ -123,8 +123,6 @@ def search(problem, algo_choice):
         node = nodeQueue.get()
         if problem.goal_test(node.get_state()):
             print("Goal!!")
-            print("To solve this problem the search algorithm expanded a total of {node_total} nodes".format(node_total = problem.get_node_count()))
-            print("The maximum number of nodes in the queue at any one time was {max_queue_nodes}.".format(max_queue_nodes=maxQueueSize))
             print("The depth of the goal node was {depth}".format(depth=node.get_gn()))
             return node
         print("The best state to expand with a g(n) = {gn} and h(n) = {hn} is ...".format(gn=node.get_gn(), hn=node.get_hn()))
