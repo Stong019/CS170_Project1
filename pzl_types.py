@@ -1,36 +1,23 @@
 import queue
 class Node:
-    def __init__(self, state, parent=None, action=None, gn=0):
+    def __init__(self, state, parent=None, action=None, gn=0, hn=0):
         self.state = state
         self.parent = parent
         self.action = action  # needed for reconstructing the path
         self.gn = gn  # cost from start node to current node
-        self.hn = 0  # est heuristic cost from current node to the goal node
-        self.fn = 0  # gn + hn
+        self.hn = hn  # est heuristic cost from current node to the goal node
+        self.fn = self.gn + self.hn  # gn + hn
 
     def __lt__(self, other):
         return self.fn < other.fn
-    
+
     def get_state(self):
         return self.state
 
-    def set_gn(self, gn):
+    def update_costs(self, gn, hn):
         self.gn = gn
-    
-    def get_gn(self):
-        return self.gn
-
-    def set_hn(self, hn):
         self.hn = hn
-
-    def get_hn(self):
-        return self.hn
-    
-    def set_fn(self, fn):
-        self.fn = fn
-
-    def get_fn(self):
-        return self.fn
+        self.fn = self.gn + self.hn
 
 
 class Problem:
