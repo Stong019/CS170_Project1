@@ -74,10 +74,13 @@ class Problem:
                 state_tuple = tuple(tuple(x) for x in new_state)
                 if state_tuple not in self.visited_states:
                     gn = input_node.gn + 1
-                    hn = self.euclidean_dist(new_state) if algo_choice == 3 else 0
                     new_node = Node(
-                        new_state, parent=input_node, action=action, gn=gn, hn=hn
+                        new_state, parent=input_node, action=action, gn=gn, hn=0
                     )
+                    if algo_choice == 2:
+                        new_node.hn = self.misplaced_tile(input_node.state)
+                    elif algo_choice == 3:
+                        new_node.hn = self.euclidean_dist(input_node.state)
                     operator_list.append(new_node)
                     self.visited_states[state_tuple] = new_node
                 elif input_node.gn + 1 < self.visited_states[state_tuple].gn:

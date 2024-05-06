@@ -35,7 +35,7 @@ def main():
     algo_choice = int(
         input(
             "\nEnter your choice of Algorithm: \n1) Uniform Cost Search"
-            "\n2) A* with the Misplaced Tile Heuristic \n3) A* with the Manhattan Distance Heuristic\n"
+            "\n2) A* with the Misplaced Tile Heuristic \n3) A* with the Euclidean Distance Heuristic\n"
         )
     )
 
