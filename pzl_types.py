@@ -99,9 +99,9 @@ class Problem:
                     if algo_choice == 1:
                         new_node.hn = 0
                     if algo_choice == 2:
-                        new_node.hn = self.misplaced_tile(self.initial_state)
+                        new_node.hn = self.misplaced_tile(new_node.state)
                     if algo_choice == 3:
-                        new_node.hn = self.euclidean_dist(self.initial_state)
+                        new_node.hn = self.euclidean_dist(new_node.state)
 
                     operator_list.append(new_node)
         return operator_list
