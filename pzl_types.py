@@ -1,4 +1,6 @@
 import queue
+
+
 class Node:
     def __init__(self, state, parent=None, action=None, gn=0, hn=0):
         self.state = state
@@ -24,46 +26,39 @@ class Problem:
     def __init__(self, initial_state):
         self.initial_state = initial_state
         self.goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
-        self.visited_states = set()
+        self.visited_states = {}
         self.expanded_cnt = 0
         self.max_node_cnt = 0
 
     def goal_test(self, state):
         return self.goal_state == state
 
-    def is_visited(self, state):
-        state_tuple = tuple(tuple(row) for row in state)
-    
-        if state_tuple in self.visited_states:
-            return True
-        self.visited_states.add(state_tuple)
-        return False
-    def get_b_pos(self, state) :
+    def get_b_pos(self, state):
         for i, row in enumerate(state):
             if 0 in row:
                 return (i, row.index(0))  # returns a tuple of (row, col)
-            
+
     def misplaced_tile(self, state):
         m_cnt = 0
         for i in range(len(state)):
-            for j in range(len(state)):
-                if int(state[i][j]) != self.goal_state[i][j] and int(state[i][j]) != 0:
+            for j in range(len(state[i])):
+                if state[i][j] != 0 and state[i][j] != self.goal_state[i][j]:
                     m_cnt += 1
         return m_cnt
-    
-    def euclidean_dist(self, state):
+
+    def manhattan_dist(self, state):
         dist = 0
         for r in range(len(state)):
-            for c in range(len(state)):
-                if state[r][c] != 0:
-                    gr = (state[r][c] - 1) // 3  
-                    gc = (state[r][c] - 1) % 3
-                    dist += ((gr - r) ** 2 + (gc - c) ** 2) ** 0.5
+            for c in range(len(state[r])):
+                val = state[r][c]
+                if val != 0:
+                    target_r = (val - 1) // 3
+                    target_c = (val - 1) % 3
+                    dist += abs(target_r - r) + abs(target_c - c)
         return dist
 
-
-    def operators(self, input_node, algo_choice) :
-        curr_state = input_node.state
+    def operators(self, input_node, algo_choice):
+        curr_state = input_node.get_state()
         row, col = self.get_b_pos(curr_state)
         directions = [(-1, 0, "up"), (1, 0, "down"), (0, -1, "left"), (0, 1, "right")]
         operator_list = []
@@ -79,58 +74,59 @@ class Problem:
                     new_state[new_row][new_col],
                     new_state[row][col],
                 )
-                if not self.is_visited(new_state):
-                    new_node = Node(
-                        new_state,
-                        parent=input_node,
-                        action=action,
-                        gn=input_node.gn + 1,
-                    )
-                    if algo_choice == 1:
-                        new_node.hn = 0
+                state_tuple = tuple(tuple(x) for x in new_state)
+                if state_tuple not in self.visited_states:
+                    gn = input_node.gn + 1
+                    hn = 0
                     if algo_choice == 2:
-                        new_node.hn = self.misplaced_tile(new_node.state)
-                    if algo_choice == 3:
-                        new_node.hn = self.euclidean_dist(new_node.state)
-
+                        hn = self.misplaced_tile(new_state)
+                    elif algo_choice == 3:
+                        hn = self.manhattan_dist(new_state)
+                    new_node = Node(
+                        new_state, parent=input_node, action=action, gn=gn, hn=hn
+                    )
                     operator_list.append(new_node)
+                    self.visited_states[state_tuple] = new_node
+                elif input_node.gn + 1 < self.visited_states[state_tuple].gn:
+                    # Update node in priority queue
+                    self.visited_states[state_tuple].update_costs(
+                        input_node.gn + 1, self.visited_states[state_tuple].hn
+                    )
+                    operator_list.append(self.visited_states[state_tuple])
         return operator_list
-    
-    def state(self):
-        return self.initial_state
-    
+
+
 def search(problem, algo_choice):
     nodeQueue = queue.PriorityQueue()
-    startNode = Node(problem.state())
-    startNode.set_gn(0)
-    startNode.set_hn(0)
-    startNode.set_fn(0)
+    initial_hn = 0
+    if algo_choice == 2:
+        initial_hn = problem.misplaced_tile(problem.initial_state)
+    elif algo_choice == 3:
+        initial_hn = problem.manhattan_dist(problem.initial_state)
+    startNode = Node(problem.initial_state, gn=0, hn=initial_hn)
     nodeQueue.put(startNode)
-    print("Expanding state")
-    
-    while(1):
-        if nodeQueue.empty():
-            return "failure"
+    problem.visited_states[tuple(tuple(x) for x in problem.initial_state)] = startNode
+
+    while not nodeQueue.empty():
         node = nodeQueue.get()
         if problem.goal_test(node.get_state()):
             print("Goal!!")
-            print("To solve this problem the search algorithm expanded a total of {node_total} nodes".format(node_total = problem.expanded_cnt))
-            print("The maximum number of nodes in the queue at any one time was {max_queue_nodes}.".format(max_queue_nodes=problem.max_node_cnt))
-            print("The depth of the goal node was {depth}".format(depth=node.get_gn()))
+            print(
+                f"To solve this problem the search algorithm expanded a total of {problem.expanded_cnt} nodes"
+            )
+            print(
+                f"The maximum number of nodes in the queue at any one time was {problem.max_node_cnt}."
+            )
+            print(f"The depth of the goal node was {node.gn}")
             return node
-        print("The best state to expand with a g(n) = {gn} and h(n) = {hn} is ...".format(gn=node.get_gn(), hn=node.get_hn()))
-        ##tile_print(node)
-        for index, tile in enumerate(node.get_state()):
-            if tile == 0:
-                print("b", end=' ')
-            else:
-                print(tile, end=' ')
-            if index % 3 == 2:
-                print()
+        print(
+            f"The best state to expand with a g(n) = {node.gn} and h(n) = {node.hn} is:"
+        )
+        for row in node.get_state():
+            print(" ".join(str(x) if x != 0 else "b" for x in row))
         print()
         newNodes = problem.operators(node, algo_choice)
-        
-        for node in newNodes:
-            nodeQueue.put(node)
+        for newNode in newNodes:
+            nodeQueue.put(newNode)
             if nodeQueue.qsize() > problem.max_node_cnt:
                 problem.max_node_cnt = nodeQueue.qsize()
