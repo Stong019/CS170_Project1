@@ -38,6 +38,8 @@ class Problem:
         self.initial_state = initial_state
         self.goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
         self.visited_states = set()
+        self.expanded_cnt = 0
+        self.max_node_cnt = 0
 
     def goal_test(self, state):
         return self.goal_state == state
@@ -78,6 +80,7 @@ class Problem:
         row, col = self.get_b_pos(curr_state)
         directions = [(-1, 0, "up"), (1, 0, "down"), (0, -1, "left"), (0, 1, "right")]
         operator_list = []
+        self.expanded_cnt += 1
 
         for dr, dc, action in directions:
             new_row, new_col = row + dr, col + dc
@@ -117,12 +120,15 @@ def search(problem, algo_choice):
     startNode.set_fn(0)
     nodeQueue.put(startNode)
     print("Expanding state")
+    
     while(1):
         if nodeQueue.empty():
             return "failure"
         node = nodeQueue.get()
         if problem.goal_test(node.get_state()):
             print("Goal!!")
+            print("To solve this problem the search algorithm expanded a total of {node_total} nodes".format(node_total = problem.expanded_cnt))
+            print("The maximum number of nodes in the queue at any one time was {max_queue_nodes}.".format(max_queue_nodes=problem.max_node_cnt))
             print("The depth of the goal node was {depth}".format(depth=node.get_gn()))
             return node
         print("The best state to expand with a g(n) = {gn} and h(n) = {hn} is ...".format(gn=node.get_gn(), hn=node.get_hn()))
@@ -136,5 +142,8 @@ def search(problem, algo_choice):
                 print()
         print()
         newNodes = problem.operators(node, algo_choice)
+        
         for node in newNodes:
             nodeQueue.put(node)
+            if nodeQueue.qsize() > problem.max_node_cnt:
+                problem.max_node_cnt = nodeQueue.qsize()
