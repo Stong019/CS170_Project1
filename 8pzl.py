@@ -40,7 +40,6 @@ def main():
     )
 
     search(problem, algo_choice)
-    
 
 
 if __name__ == "__main__":

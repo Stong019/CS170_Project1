@@ -46,15 +46,14 @@ class Problem:
                     m_cnt += 1
         return m_cnt
 
-    def manhattan_dist(self, state):
+    def euclidean_dist(self, state):
         dist = 0
         for r in range(len(state)):
-            for c in range(len(state[r])):
-                val = state[r][c]
-                if val != 0:
-                    target_r = (val - 1) // 3
-                    target_c = (val - 1) % 3
-                    dist += abs(target_r - r) + abs(target_c - c)
+            for c in range(len(state)):
+                if state[r][c] != 0:
+                    gr = (state[r][c] - 1) // 3
+                    gc = (state[r][c] - 1) % 3
+                    dist += ((gr - r) ** 2 + (gc - c) ** 2) ** 0.5
         return dist
 
     def operators(self, input_node, algo_choice):
@@ -66,9 +65,7 @@ class Problem:
 
         for dr, dc, action in directions:
             new_row, new_col = row + dr, col + dc
-            if (
-                0 <= new_row < 3 and 0 <= new_col < 3
-            ):  # check if the new node is in bounds
+            if 0 <= new_row < 3 and 0 <= new_col < 3:
                 new_state = [r[:] for r in curr_state]  # deep copy of 2D list
                 new_state[row][col], new_state[new_row][new_col] = (
                     new_state[new_row][new_col],
@@ -77,18 +74,13 @@ class Problem:
                 state_tuple = tuple(tuple(x) for x in new_state)
                 if state_tuple not in self.visited_states:
                     gn = input_node.gn + 1
-                    hn = 0
-                    if algo_choice == 2:
-                        hn = self.misplaced_tile(new_state)
-                    elif algo_choice == 3:
-                        hn = self.manhattan_dist(new_state)
+                    hn = self.euclidean_dist(new_state) if algo_choice == 3 else 0
                     new_node = Node(
                         new_state, parent=input_node, action=action, gn=gn, hn=hn
                     )
                     operator_list.append(new_node)
                     self.visited_states[state_tuple] = new_node
                 elif input_node.gn + 1 < self.visited_states[state_tuple].gn:
-                    # Update node in priority queue
                     self.visited_states[state_tuple].update_costs(
                         input_node.gn + 1, self.visited_states[state_tuple].hn
                     )
@@ -102,7 +94,7 @@ def search(problem, algo_choice):
     if algo_choice == 2:
         initial_hn = problem.misplaced_tile(problem.initial_state)
     elif algo_choice == 3:
-        initial_hn = problem.manhattan_dist(problem.initial_state)
+        initial_hn = problem.euclidean_dist(problem.initial_state)
     startNode = Node(problem.initial_state, gn=0, hn=initial_hn)
     nodeQueue.put(startNode)
     problem.visited_states[tuple(tuple(x) for x in problem.initial_state)] = startNode
