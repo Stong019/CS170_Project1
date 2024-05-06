@@ -137,6 +137,6 @@ def search(problem, algo_choice):
             if index % 3 == 2:
                 print()
         print()
-        newNodes = problem.operator(node, algo_choice)
+        newNodes = problem.operators(node, algo_choice)
         for node in newNodes:
             nodeQueue.put(node)

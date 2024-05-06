@@ -1,4 +1,4 @@
-from pzl_types import Node, Problem
+from pzl_types import Node, Problem, search
 
 
 def main():
@@ -39,7 +39,7 @@ def main():
         )
     )
 
-    problem.search(algo_choice)
+    search(problem, algo_choice)
     
 
 
